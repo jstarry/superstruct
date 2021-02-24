@@ -625,6 +625,17 @@ export function union(Structs: Struct<any>[]): any {
   return new Struct({
     type: 'union',
     schema: null,
+    coercer(value, ctx) {
+      const options = { ...ctx, coerce: true }
+      for (const S of Structs) {
+        const [...tuples] = run(value, S, options)
+        const [first] = tuples
+        if (!first[0]) {
+          return first[1]
+        }
+      }
+      return value
+    },
     validator(value, ctx) {
       const failures = []
 
